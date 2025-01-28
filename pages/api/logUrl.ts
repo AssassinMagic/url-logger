@@ -1,7 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
+const { Pool } = require('pg');
 
-const prisma = new PrismaClient();
+// Set up PostgreSQL connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // Ensure compatibility with Neon
+  },
+});
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
@@ -13,9 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       // Save the endpoint to the database
-      await prisma.endpoint.create({
-        data: { endpoint },
-      });
+      await pool.query("INSERT INTO endpoints (endpoint, created_at) VALUES ($1, NOW())", [endpoint]);
 
       return res.status(200).json({ message: "URL logged successfully" });
     } catch (error) {
