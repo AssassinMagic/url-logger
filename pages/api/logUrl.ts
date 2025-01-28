@@ -18,8 +18,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: "Endpoint is required" });
       }
 
-      // Save the endpoint to the database
-      await pool.query("INSERT INTO endpoints (endpoint, created_at) VALUES ($1, NOW())", [endpoint]);
+      // Extract the last part of the URL (after the last "/")
+      const lastSegment = endpoint.split("/").filter(Boolean).pop();
+
+      if (!lastSegment) {
+        return res.status(400).json({ error: "Invalid endpoint format" });
+      }
+
+      // Save the last segment of the endpoint to the database
+      await pool.query("INSERT INTO endpoints (endpoint, created_at) VALUES ($1, NOW())", [lastSegment]);
 
       return res.status(200).json({ message: "URL logged successfully" });
     } catch (error) {

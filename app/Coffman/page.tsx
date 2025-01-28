@@ -8,18 +8,13 @@ export default function Home() {
       try {
         const currentUrl = window.location.href;
 
-        // Use the URL API to get the path and extract the last part
-        const url = new URL(currentUrl);
-        const pathSegments = url.pathname.split("/").filter(Boolean); // Split and remove empty segments
-        const lastSegment = pathSegments[pathSegments.length - 1]; // Get the last part
-
-        // Log the last part of the URL to the API
+        // Log the URL to the API
         await fetch("/api/logUrl", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ endpoint: lastSegment }),
+          body: JSON.stringify({ endpoint: currentUrl }),
         });
 
         // Redirect to the Google Form
