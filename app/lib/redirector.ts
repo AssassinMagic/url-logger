@@ -18,7 +18,7 @@ export default function useRedirector() {
         });
 
         // Redirect to the Google Form
-        window.location.href = "https://forms.google.com/your-google-form-link";
+        window.location.href = "https://swad-form.vercel.app/";
       } catch (error) {
         console.error("Error logging URL or redirecting:", error);
       }
