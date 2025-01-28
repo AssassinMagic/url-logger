@@ -2,6 +2,5 @@ Next.js app deployed with Vercel. url-logger-git-main-raymonds-projects-95702840
 
 Make sure to use the Uppercase first letter of the location.
 
-Data hosted with Neon here: https://console.neon.tech/app/projects/bitter-boat-65195197/branches/br-small-cell-a4by5war/tables?database=neondb
-
+Data hosted with Neon.
 
