@@ -1,0 +1,5 @@
+model Endpoint {
+  id        Int      @id @default(autoincrement())
+  endpoint  String
+  createdAt DateTime @default(now())
+}
