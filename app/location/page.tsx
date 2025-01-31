@@ -1,17 +1,18 @@
 // app/location/page.tsx
+import React from 'react';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { notFound } from 'next/navigation';
-import Director from "@/app/location/director";
+import Director from '@/app/location/director';
 
-// Inline the type for the props parameter instead of using a custom interface.
-// Next.js expects the props to be shaped like this.
 export default async function LocationPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { location } = searchParams;
+  // Await the searchParams in case they are provided as a promise.
+  const resolvedSearchParams = await searchParams;
+  const { location } = resolvedSearchParams;
 
   // Validate that "location" is provided and is a string.
   if (!location || Array.isArray(location)) {
@@ -21,7 +22,7 @@ export default async function LocationPage({
   // Construct the path to your CSV file.
   const csvFilePath = path.join(process.cwd(), 'data', 'locations.csv');
 
-  let csvData: string;
+  let csvData: string = '';
   try {
     csvData = await fs.readFile(csvFilePath, 'utf8');
   } catch (error) {
@@ -32,11 +33,11 @@ export default async function LocationPage({
   // Parse the CSV assuming one location per line.
   const validLocations = csvData
     .split('\n')
-    .map(line => line.trim())
-    .filter(line => line !== '');
+    .map((line) => line.trim())
+    .filter((line) => line !== '');
 
   // If the provided location is not in the CSV, show a 404.
-  if (!validLocations.includes(location)) {
+  if (typeof location !== 'string' || !validLocations.includes(location)) {
     notFound();
   }
 
