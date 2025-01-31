@@ -4,11 +4,13 @@ import path from 'path';
 import { notFound } from 'next/navigation';
 import Director from "@/app/location/director";
 
-interface PageProps {
-  searchParams: { location?: string | string[] };
-}
-
-export default async function LocationPage({ searchParams }: PageProps) {
+// Inline the type for the props parameter instead of using a custom interface.
+// Next.js expects the props to be shaped like this.
+export default async function LocationPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const { location } = searchParams;
 
   // Validate that "location" is provided and is a string.
