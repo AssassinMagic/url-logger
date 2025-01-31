@@ -1,17 +1,18 @@
+// app/location/page.tsx
 import { promises as fs } from 'fs';
 import path from 'path';
 import { notFound } from 'next/navigation';
 import Director from "@/app/location/director";
 
 interface PageProps {
-  searchParams: { location?: string };
+  searchParams: { location?: string | string[] };
 }
 
 export default async function LocationPage({ searchParams }: PageProps) {
   const { location } = searchParams;
 
   // Validate that "location" is provided and is a string.
-  if (!location || typeof location !== 'string') {
+  if (!location || Array.isArray(location)) {
     notFound();
   }
 
@@ -38,5 +39,5 @@ export default async function LocationPage({ searchParams }: PageProps) {
   }
 
   // If valid, render the client component to perform the redirect.
-  return <Director/>;
+  return <Director />;
 }
