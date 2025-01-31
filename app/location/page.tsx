@@ -10,12 +10,15 @@ export default async function LocationPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  // Await the searchParams in case they are provided as a promise.
+  // Await the searchParams in case they're provided as a promise.
   const resolvedSearchParams = await searchParams;
-  const { location } = resolvedSearchParams;
+  const { location, eventID } = resolvedSearchParams;
 
-  // Validate that "location" is provided and is a string.
+  // Validate that "location" and "eventID" are provided and are strings.
   if (!location || Array.isArray(location)) {
+    notFound();
+  }
+  if (!eventID || Array.isArray(eventID)) {
     notFound();
   }
 
@@ -30,14 +33,38 @@ export default async function LocationPage({
     notFound();
   }
 
-  // Parse the CSV assuming one location per line.
-  const validLocations = csvData
+  // Parse the CSV.
+  // Split the file into lines and filter out any empty lines.
+  const lines = csvData
     .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line !== '');
+    .map(line => line.trim())
+    .filter(line => line !== '');
 
-  // If the provided location is not in the CSV, show a 404.
-  if (typeof location !== 'string' || !validLocations.includes(location)) {
+  if (lines.length === 0) {
+    notFound();
+  }
+
+  // Check if the first line is a header by looking for keywords.
+  let dataLines: string[] = [];
+  if (
+    lines[0].toLowerCase().includes('event') &&
+    lines[0].toLowerCase().includes('location')
+  ) {
+    // Assume first line is a header.
+    dataLines = lines.slice(1);
+  } else {
+    dataLines = lines;
+  }
+
+  // Validate that there is a row with the matching eventID and location.
+  const isValid = dataLines.some(line => {
+    const [csvEventID, csvLocation] = line
+      .split(',')
+      .map(field => field.trim());
+    return csvEventID === eventID && csvLocation === location;
+  });
+
+  if (!isValid) {
     notFound();
   }
 
