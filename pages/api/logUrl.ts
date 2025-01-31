@@ -13,21 +13,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "POST") {
     try {
       const { endpoint } = req.body;
-
       if (!endpoint) {
         return res.status(400).json({ error: "Endpoint is required" });
       }
-
-      // Extract the last part of the URL (after the last "/")
-      const lastSegment = endpoint.split("/").filter(Boolean).pop();
-
-      if (!lastSegment) {
-        return res.status(400).json({ error: "Invalid endpoint format" });
+      
+      // Parse the URL to extract query parameters.
+      let parsedUrl;
+      try {
+        parsedUrl = new URL(endpoint);
+      } catch (error) {
+        return res.status(400).json({ error: "Invalid URL provided" });
       }
-
-      // Save the last segment of the endpoint to the database
-      await pool.query("INSERT INTO endpoints (endpoint, created_at) VALUES ($1, NOW())", [lastSegment]);
-
+      
+      // Extract the eventID and location from the query parameters.
+      const eventID = parsedUrl.searchParams.get("eventID");
+      const location = parsedUrl.searchParams.get("location");
+      
+      if (!eventID || !location) {
+        return res.status(400).json({ error: "Both eventID and location query parameters are required." });
+      }
+      
+      // Insert the eventID and location into the database.
+      await pool.query(
+        "INSERT INTO endpoints (event_id, location, created_at) VALUES ($1, $2, NOW())",
+        [eventID, location]
+      );
+      
       return res.status(200).json({ message: "URL logged successfully" });
     } catch (error) {
       console.error("Error logging URL:", error);
